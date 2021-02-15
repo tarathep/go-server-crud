@@ -15,6 +15,6 @@ func main() {
 		log.Panic(err)
 	}
 
-	route := router.Router{apis.HelloHandler{db}}
-	route.Route().Run()
+	route := router.Router{apis.HelloHandler{db}, apis.TutorialHandler{db}}
+	route.Route().Run(":8089")
 }

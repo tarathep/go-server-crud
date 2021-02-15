@@ -1,14 +1,18 @@
 package model
 
-import "go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Tutorial struct {
-	ID          uuid.UUID `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Published   bool      `json:"published"`
-	CreatedAt   string    `json:"createdAt"`
-	UpdatedAt   string    `json:"updatedAt"`
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	Title       string             `json:"title"`
+	Description string             `json:"description"`
+	Published   bool               `json:"published"`
+	CreatedAt   time.Time          `json:"createdAt"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
 }
 
 // EXAMPLE OUTPUT JSON

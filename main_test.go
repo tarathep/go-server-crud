@@ -27,7 +27,7 @@ func (db *mockDB) InsertHello(hello model.Hello) (model.Hello, error) {
 }
 
 func TestGetHello(t *testing.T) {
-	router := router.Router{apis.HelloHandler{&mockDB{}}}
+	router := router.Router{apis.HelloHandler{&mockDB{}}, apis.TutorialHandler{}}
 	r := router.Route()
 
 	w := httptest.NewRecorder()
@@ -44,7 +44,7 @@ func TestGetHello(t *testing.T) {
 }
 
 func TestHelloAdd(t *testing.T) {
-	router := router.Router{apis.HelloHandler{&mockDB{}}}
+	router := router.Router{apis.HelloHandler{&mockDB{}}, apis.TutorialHandler{}}
 	r := router.Route()
 
 	w := httptest.NewRecorder()
