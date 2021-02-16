@@ -28,13 +28,17 @@ func CORSMiddleware() gin.HandlerFunc {
 
 // Route is setup router
 func (router Router) Route() *gin.Engine {
+
+	gin.SetMode(gin.DebugMode)
+
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 	r.GET("/hello", router.GetHello)
 	r.POST("/hello", router.PostHello)
 
 	r.POST("/api/tutorials", router.CreateTutorial)
-	r.GET("/api/tutorials", router.AllTutorial)
+	r.GET("/api/tutorials", router.ReadTutorials)
+	r.GET("/api/tutorials/:id", router.ReadTutorial)
 
 	return r
 }

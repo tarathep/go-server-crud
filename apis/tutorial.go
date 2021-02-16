@@ -25,7 +25,7 @@ func (h *TutorialHandler) CreateTutorial(c *gin.Context) {
 	c.String(200, "Inserted a single document Success")
 }
 
-func (h *TutorialHandler) AllTutorial(c *gin.Context) {
+func (h *TutorialHandler) ReadTutorials(c *gin.Context) {
 	title := c.Query("title")
 	tutorials, err := h.DB.FindAll(title)
 	if err != nil {
@@ -33,4 +33,31 @@ func (h *TutorialHandler) AllTutorial(c *gin.Context) {
 		return
 	}
 	c.JSON(200, tutorials)
+}
+
+func (h *TutorialHandler) ReadTutorial(c *gin.Context) {
+	id := c.Param("id")
+
+	tutorials, err := h.DB.FindOne(id)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, tutorials)
+}
+
+//UpdateTutorial non test!!
+func (h *TutorialHandler) UpdateTutorial(c *gin.Context) {
+
+	tutorial := model.Tutorial{}
+	if err := c.ShouldBindJSON(&tutorial); err != nil {
+		c.String(500, err.Error())
+		return
+	}
+
+	if err := h.DB.Update(tutorial); err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.String(200, "Updated a single document Success")
 }

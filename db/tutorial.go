@@ -2,11 +2,12 @@ package db
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"log"
 
 	"github.com/tarathep/go-server-crud/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
@@ -15,11 +16,11 @@ import (
 type TutorialRepository interface {
 	Create(tutorial model.Tutorial) error
 	FindAll(title string) ([]*model.Tutorial, error)
-	FindOne(id uuid.UUID) (model.Tutorial, error)
-	Update(id uuid.UUID) error
+	FindOne(id string) (model.Tutorial, error)
+	Update(tutorial model.Tutorial) error
 	Delete(id uuid.UUID) error
 	DeleteAll() error
-	FindAllPublished() ([]model.Tutorial, error)
+	FindAllPublished() ([]*model.Tutorial, error)
 }
 
 func (db *MongoDB) Create(tutorial model.Tutorial) error {
@@ -63,28 +64,91 @@ func (db *MongoDB) FindAll(title string) ([]*model.Tutorial, error) {
 	return results, nil
 }
 
-func (db *MongoDB) FindOne(id uuid.UUID) (model.Tutorial, error) {
+func (db *MongoDB) FindOne(id string) (model.Tutorial, error) {
 	var tutorial model.Tutorial
-	return tutorial, errors.New("err")
+	collection := db.Database("bokie").Collection("tutorials")
+
+	//String hex to ObjId
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Println("-->", err)
+		return tutorial, err
+	}
+
+	if err := collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&tutorial); err != nil {
+		fmt.Println("-->", err)
+		return tutorial, err
+	}
+	return tutorial, nil
 }
 
-func (db *MongoDB) Update(id uuid.UUID) error {
+func (db *MongoDB) Update(tutorial model.Tutorial) error {
+	collection := db.Database("bokie").Collection("tutorials")
+	//UpdateMany or UpdateOne
+	result, err := collection.UpdateMany(
+		context.TODO(),
+		bson.M{"_id": tutorial.ID},
+		bson.D{
+			{"$set", bson.D{{"title", tutorial.Title}}},
+			{"$set", bson.D{{"description", tutorial.Description}}},
+			{"$set", bson.D{{"published", tutorial.Published}}},
+			{"$set", bson.D{{"updatedat", tutorial.UpdatedAt}}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	fmt.Printf("Updated %v Documents!\n", result.ModifiedCount)
 
-	return errors.New("err")
+	return nil
 }
 
 func (db *MongoDB) Delete(id uuid.UUID) error {
-
-	return errors.New("err")
+	collection := db.Database("bokie").Collection("tutorials")
+	result, err := collection.DeleteMany(context.TODO(), bson.M{"_id": id})
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	fmt.Printf("DeleteMany removed %v document(s)\n", result.DeletedCount)
+	return nil
 }
 
 func (db *MongoDB) DeleteAll() error {
-
-	return errors.New("err")
+	collection := db.Database("bokie").Collection("tutorials")
+	result, err := collection.DeleteMany(context.TODO(), bson.M{})
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	fmt.Printf("DeleteMany removed %v document(s)\n", result.DeletedCount)
+	return nil
 }
 
-func (db *MongoDB) FindAllPublished() ([]model.Tutorial, error) {
+//FindAllPublished func is find all published into mongodb is true
+func (db *MongoDB) FindAllPublished() ([]*model.Tutorial, error) {
+	var results []*model.Tutorial
 
-	var tutorials []model.Tutorial
-	return tutorials, errors.New("err")
+	collection := db.Database("bokie").Collection("tutorials")
+
+	cur, err := collection.Find(context.TODO(), bson.M{"published": true}, options.Find())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		var elem model.Tutorial
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		results = append(results, &elem)
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	cur.Close(context.TODO())
+	return results, nil
 }
