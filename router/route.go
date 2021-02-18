@@ -5,11 +5,13 @@ import (
 	"github.com/tarathep/go-server-crud/apis"
 )
 
+// Router to apis lisening
 type Router struct {
-	apis.HelloHandler
-	apis.TutorialHandler
+	HelloAPIs    apis.HelloHandler
+	TutorialAPIs apis.TutorialHandler
 }
 
+// CORSMiddleware is Cross-Origin Resource Sharing Middleware
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
@@ -33,17 +35,16 @@ func (router Router) Route() *gin.Engine {
 
 	r := gin.Default()
 	r.Use(CORSMiddleware())
-	r.GET("/hello", router.GetHello)
-	r.POST("/hello", router.PostHello)
+	r.GET("/hello", router.HelloAPIs.GetHello)
+	r.POST("/hello", router.HelloAPIs.PostHello)
 
-	r.GET("/api/tutorials", router.ReadTutorials)
-	r.GET("/api/tutorials/:id", router.ReadTutorial)
-	r.POST("/api/tutorials", router.CreateTutorial)
-	r.PUT("/api/tutorials", router.UpdateTutorial)
-	r.PUT("/api/tutorials/:id", router.UpdateTutorial)
-
-	r.DELETE("/api/tutorials/:id", router.DeleteTutorial)
-	r.DELETE("/api/tutorials", router.DeleteTutorials)
+	r.GET("/api/tutorials", router.TutorialAPIs.ReadTutorials)
+	r.GET("/api/tutorials/:id", router.TutorialAPIs.ReadTutorial)
+	r.POST("/api/tutorials", router.TutorialAPIs.CreateTutorial)
+	r.PUT("/api/tutorials", router.TutorialAPIs.UpdateTutorial)
+	r.PUT("/api/tutorials/:id", router.TutorialAPIs.UpdateTutorial)
+	r.DELETE("/api/tutorials/:id", router.TutorialAPIs.DeleteTutorial)
+	r.DELETE("/api/tutorials", router.TutorialAPIs.DeleteTutorials)
 
 	return r
 }
