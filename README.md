@@ -1,14 +1,12 @@
 # go-server-crud
  tutorial backend rest api work with frontend vue.js
 
-<table border=none>
-  <tr align=left>
-    <td>Framework By  <a href="https://github.com/gin-gonic/gin">Gin Web Framework</a></td>
-    <td><img src="https://raw.githubusercontent.com/gin-gonic/logo/master/color.png" width="10%"></td>
-</tr>
-</table>
 
 
+<img src="https://raw.githubusercontent.com/gin-gonic/logo/master/color.png" width="5%">
+Framework By 
+
+[Gin Web Framework](https://github.com/gin-gonic/gin)
 
 
 
