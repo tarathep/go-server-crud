@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
 //TutorialRepository is contain interface
@@ -18,7 +17,7 @@ type TutorialRepository interface {
 	FindAll(title string) ([]*model.Tutorial, error)
 	FindOne(id string) (model.Tutorial, error)
 	Update(tutorial model.Tutorial) error
-	Delete(id uuid.UUID) error
+	Delete(id string) error
 	DeleteAll() error
 	FindAllPublished() ([]*model.Tutorial, error)
 }
@@ -104,14 +103,22 @@ func (db *MongoDB) Update(tutorial model.Tutorial) error {
 	return nil
 }
 
-func (db *MongoDB) Delete(id uuid.UUID) error {
+func (db *MongoDB) Delete(id string) error {
+
+	//String hex to ObjId
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Println("-->", err)
+		return err
+	}
+
 	collection := db.Database("bokie").Collection("tutorials")
-	result, err := collection.DeleteMany(context.TODO(), bson.M{"_id": id})
+	result, err := collection.DeleteMany(context.TODO(), bson.M{"_id": objID})
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
-	fmt.Printf("DeleteMany removed %v document(s)\n", result.DeletedCount)
+	fmt.Printf("Delete(S) removed %v document(s)\n", result.DeletedCount)
 	return nil
 }
 

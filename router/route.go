@@ -15,7 +15,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT, DELETE")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
@@ -36,9 +36,14 @@ func (router Router) Route() *gin.Engine {
 	r.GET("/hello", router.GetHello)
 	r.POST("/hello", router.PostHello)
 
-	r.POST("/api/tutorials", router.CreateTutorial)
 	r.GET("/api/tutorials", router.ReadTutorials)
 	r.GET("/api/tutorials/:id", router.ReadTutorial)
+	r.POST("/api/tutorials", router.CreateTutorial)
+	r.PUT("/api/tutorials", router.UpdateTutorial)
+	r.PUT("/api/tutorials/:id", router.UpdateTutorial)
+
+	r.DELETE("/api/tutorials/:id", router.DeleteTutorial)
+	r.DELETE("/api/tutorials", router.DeleteTutorials)
 
 	return r
 }

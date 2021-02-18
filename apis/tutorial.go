@@ -61,3 +61,22 @@ func (h *TutorialHandler) UpdateTutorial(c *gin.Context) {
 	}
 	c.String(200, "Updated a single document Success")
 }
+
+func (h *TutorialHandler) DeleteTutorial(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := h.DB.Delete(id); err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.String(200, "Deleted id:"+id)
+}
+
+func (h *TutorialHandler) DeleteTutorials(c *gin.Context) {
+
+	if err := h.DB.DeleteAll(); err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.String(200, "All deleted")
+}
